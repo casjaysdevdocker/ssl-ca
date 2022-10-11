@@ -19,11 +19,13 @@ VERSION="202207112331-git"
 USER="${SUDO_USER:-${USER}}"
 HOME="${USER_HOME:-${HOME}}"
 SRC_DIR="${BASH_SOURCE%/*}"
-SSL_DIR="${MY_SSL_HOME:-$(cd "$SRC_DIR/../CasjaysDev" && echo "$PWD" || exit 1)}"
+SSL_DIR="${MY_SSL_HOME:-$SSL_DIR}"
 REVOKE_FILE="revoke.crl"
+[ -n "$SSL_DIR" ] || SSL_DIR="/config/ssl"
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 mkdir -p "$SSL_DIR" "$SSL_DIR/crl" "$SSL_DIR/private" "$SSL_DIR/certs" "$SSL_DIR/p12" "$SSL_DIR/requests"
 cd "$SSL_DIR" || exit 1
 [[ -f "$SSL_DIR/certs/ca.crt" ]] || "$SRC_DIR/ca-setup.sh"
 openssl ca -config "$SSL_DIR/openssl.cnf" -gencrl -keyfile $SSL_DIR/private/ca.key -cert $SSL_DIR/certs/ca.crt -out "$SSL_DIR/crl/$REVOKE_FILE" -passin file:$SSL_DIR/passwd
 openssl crl -inform PEM -in "$SSL_DIR/crl/revoke.crl.pem" -outform DER -out "$SSL_DIR/crl/$REVOKE_FILE"
+

@@ -14,17 +14,20 @@
 # @Resource          :
 # @sudo/root         :  no
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# Set bash options
+[ -n "$DEBUG" ] && set -x
+set -o pipefail
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 APPNAME="$(basename "$0")"
 VERSION="202207112331-git"
 USER="${SUDO_USER:-${USER}}"
 HOME="${USER_HOME:-${HOME}}"
 SRC_DIR="${BASH_SOURCE%/*}"
-SSL_DIR="${MY_SSL_HOME:-$(cd "$SRC_DIR/../CA" && echo "$PWD" || exit 1)}"
+SSL_DIR="${MY_SSL_HOME:-$SSL_DIR}"
 SSL_SYS_DIR="${SSL_DIR}"
+[ -n "$SSL_DIR" ] || SSL_DIR="/config/ssl"
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-# Set bash options
-if [[ "$1" == "--debug" ]]; then shift 1 && set -xo pipefail && export SCRIPT_OPTS="--debug" && export _DEBUG="on"; fi
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-cd "$SSL_DIR/.." || exit 1
-sudo mkdir -p "$SSL_SYS_DIR"
-sudo rsync -avhP "." "$SSL_SYS_DIR/"
+mkdir -p "$SSL_SYS_DIR" "$SSL_DIR"
+cd "$SSL_DIR"
+[ "$SSL_DIR" = "$SSL_SYS_DIR" ] || rsync -avhP "$SSL_DIR/." "$SSL_SYS_DIR/"
+
