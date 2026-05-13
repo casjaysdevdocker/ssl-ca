@@ -1,48 +1,79 @@
-# 👋 ssl-ca Readme 👋
+## 👋 Welcome to ssl-ca 🚀  
 
-ssl-ca README
-
-## Run container
+ssl-ca README  
+  
+  
+## Install my system scripts  
 
 ```shell
-dockermgr install ssl-ca
+ sudo bash -c "$(curl -q -LSsf "https://github.com/systemmgr/installer/raw/main/install.sh")"
+ sudo systemmgr --config && sudo systemmgr install scripts  
 ```
-
-### via command line
-
+  
+## Automatic install/update  
+  
 ```shell
-docker pull casjaysdevdocker/ssl-ca:latest && \
+dockermgr update ssl-ca
+```
+  
+## Install and run container
+  
+```shell
+dockerHome="/var/lib/srv/$USER/docker/casjaysdevdocker/ssl-ca/ssl-ca/latest/rootfs"
+mkdir -p "/var/lib/srv/$USER/docker/ssl-ca/rootfs"
+git clone "https://github.com/dockermgr/ssl-ca" "$HOME/.local/share/CasjaysDev/dockermgr/ssl-ca"
+cp -Rfva "$HOME/.local/share/CasjaysDev/dockermgr/ssl-ca/rootfs/." "$dockerHome/"
 docker run -d \
 --restart always \
---name casjaysdevdocker-ssl-ca \
---hostname casjaysdev-ssl-ca \
+--privileged \
+--name casjaysdevdocker-ssl-ca-latest \
+--hostname ssl-ca \
 -e TZ=${TIMEZONE:-America/New_York} \
--v $HOME/.local/share/docker/storage/ssl-ca/ssl-ca/data:/data \
--v $HOME/.local/share/docker/storage/ssl-ca/ssl-ca/config:/config \
+-v "$dockerHome/data:/data:z" \
+-v "$dockerHome/config:/config:z" \
 -p 80:80 \
 casjaysdevdocker/ssl-ca:latest
 ```
-
-### via docker-compose
-
+  
+## via docker-compose  
+  
 ```yaml
 version: "2"
 services:
-  ssl-ca:
+  ProjectName:
     image: casjaysdevdocker/ssl-ca
-    container_name: ssl-ca
+    container_name: casjaysdevdocker-ssl-ca
     environment:
       - TZ=America/New_York
-      - HOSTNAME=casjaysdev-ssl-ca
+      - HOSTNAME=ssl-ca
     volumes:
-      - $HOME/.local/share/docker/storage/ssl-ca/data:/data:z
-      - $HOME/.local/share/docker/storage/ssl-ca/config:/config:z
+      - "/var/lib/srv/$USER/docker/casjaysdevdocker/ssl-ca/ssl-ca/latest/rootfs/data:/data:z"
+      - "/var/lib/srv/$USER/docker/casjaysdevdocker/ssl-ca/ssl-ca/latest/rootfs/config:/config:z"
     ports:
       - 80:80
     restart: always
 ```
-
+  
+## Get source files  
+  
+```shell
+dockermgr download src casjaysdevdocker/ssl-ca
+```
+  
+OR
+  
+```shell
+git clone "https://github.com/casjaysdevdocker/ssl-ca" "$HOME/Projects/github/casjaysdevdocker/ssl-ca"
+```
+  
+## Build container  
+  
+```shell
+cd "$HOME/Projects/github/casjaysdevdocker/ssl-ca"
+buildx 
+```
+  
 ## Authors  
-
-🤖 casjay: [Github](https://github.com/casjay) [Docker](https://hub.docker.com/r/casjay) 🤖  
-⛵ CasjaysDev: [Github](https://github.com/casjaysdev) [Docker](https://hub.docker.com/r/casjaysdev) ⛵  
+  
+🤖 casjay: [Github](https://github.com/casjay) 🤖  
+⛵ casjaysdevdocker: [Github](https://github.com/casjaysdevdocker) [Docker](https://hub.docker.com/u/casjaysdevdocker) ⛵  
